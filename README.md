@@ -102,7 +102,7 @@ Maintenance logs are:
 
 <p align="center">
   <img src="docs/Screenshot_1.png" width="48%"/>
-  <img src="docs/Screenshot_1.png" width="48%"/>
+  <img src="docs/Screenshot_2.png" width="48%"/>
 </p>
 
 > To add your own screenshot, create a `docs/` folder and save the image as `docs/screenshot.png`.
