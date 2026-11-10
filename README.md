@@ -558,10 +558,10 @@ This project is licensed under the **MIT License**. See the `LICENSE` file for d
 
 ## 👤 Author
 
-**Lakshmi Narayana Kamma**
+**Deva Manikanta**
 
-- GitHub: [@<your-username>](https://github.com/<your-username>)
-- LinkedIn: [<your-linkedin>](https://linkedin.com/in/<your-linkedin>)
+- GitHub: [@ Deva Manikanta](https://github.com/pachava-Deva-Manikanta)
+- LinkedIn: [Deva Manikanta](https://www.linkedin.com/in/deva-manikanta)
 
 ---
 
