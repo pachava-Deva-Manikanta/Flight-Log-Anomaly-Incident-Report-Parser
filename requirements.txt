@@ -1,0 +1,9 @@
+pandas
+nltk
+scikit-learn
+pyyaml
+mlflow
+fastapi
+uvicorn[standard]
+jinja2
+joblib

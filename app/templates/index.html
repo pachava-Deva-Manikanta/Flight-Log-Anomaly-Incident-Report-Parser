@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AeroTriage // Aviation Maintenance Incident & Urgency Intelligence</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css?v=4.1">
+</head>
+<body>
+    <!-- Background Animated Canvas & Ambient Elements -->
+    <div class="ambient-bg">
+        <div class="ambient-glow glow-1"></div>
+        <div class="ambient-glow glow-2"></div>
+        <div class="ambient-glow glow-3"></div>
+        <div class="radar-grid"></div>
+        <div class="radar-sweep"></div>
+    </div>
+
+    <!-- Main Application Shell -->
+    <div class="app-container">
+        
+        <!-- Navigation & Global Telemetry Bar -->
+        <header class="top-nav">
+            <div class="brand">
+                <div class="brand-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/>
+                    </svg>
+                </div>
+                <div class="brand-text">
+                    <h1>DGPB AIRLINES <span class="edition-tag">PROD OS</span></h1>
+                    <span class="subtext">Flight Log Anomaly & Defect Safety Classifier</span>
+                </div>
+            </div>
+
+            <div class="telemetry-bar">
+                <div class="telemetry-item time-widget">
+                    <span class="telemetry-icon">⏱</span>
+                    <span id="zuluTime">00:00:00 IST</span>
+                </div>
+                <div class="telemetry-item model-widget" id="modelWidget">
+                    <span class="pulse-dot"></span>
+                    <span id="modelStatusText">Model: Initializing…</span>
+                </div>
+                <button class="nav-btn" id="openHistoryBtn" type="button">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                    Incident Audit Log (<span id="historyCount">0</span>)
+                </button>
+            </div>
+        </header>
+
+        <!-- Stepper Visual Progress -->
+        <div class="stepper-track">
+            <div class="step-node active" id="stepNode1">
+                <div class="step-num">01</div>
+                <div class="step-desc">
+                    <strong>Incident Reporter</strong>
+                    <span>Credentialing & Flight</span>
+                </div>
+            </div>
+            <div class="step-connector" id="stepConnector"></div>
+            <div class="step-node" id="stepNode2">
+                <div class="step-num">02</div>
+                <div class="step-desc">
+                    <strong>Defect Diagnostics</strong>
+                    <span>Component & Description</span>
+                </div>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step-node" id="stepNode3">
+                <div class="step-num">03</div>
+                <div class="step-desc">
+                    <strong>AI Safety Matrix</strong>
+                    <span>Triage & Urgency Action</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Verified Reporter Summary Ribbon (Shown when Step 1 is completed/saved) -->
+        <div class="reporter-ribbon" id="reporterRibbon" style="display: none;">
+            <div class="reporter-avatar" id="ribbonAvatar">AV</div>
+            <div class="ribbon-details">
+                <div class="ribbon-title">
+                    <span class="ribbon-name" id="ribbonName">Capt.Deva</span>
+                    <span class="ribbon-badge" id="ribbonBadge">ID: KUAD - 3045</span>
+                    <span class="ribbon-role" id="ribbonRole">Captain/Pilot in command</span>
+                </div>
+                <div class="ribbon-meta">
+                    <span><strong>Station:</strong> <span id="ribbonStation">HYD / T4</span></span>
+                    <span><strong>Aircraft:</strong> <span id="ribbonAircraft">N789AA (B737-800)</span></span>
+                    <span><strong>Flight:</strong> <span id="ribbonFlight">AA-3045</span></span>
+                </div>
+            </div>
+            <button class="ribbon-edit-btn" id="editReporterBtn" type="button">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                Modify Reporter
+            </button>
+        </div>
+
+        <!-- STEP 1: Reporter Details Card -->
+        <section class="glass-card section-card" id="reporterCard">
+            <div class="card-header">
+                <div class="card-title-group">
+                    <div class="card-badge">Step 01 of 02</div>
+                    <h2>Incident Reporter Profile & Flight Manifest</h2>
+                    <p>Enter the credentials of the authorized personnel logging this technical anomaly.</p>
+                </div>
+                <div class="preset-group">
+                    <span class="preset-label">Quick Fill:</span>
+                    <button type="button" class="preset-btn" id="presetEngineer">🔧 Line Engineer</button>
+                    <button type="button" class="preset-btn" id="presetPilot">👨‍✈️ Flight Captain</button>
+                </div>
+            </div>
+
+            <form id="reporterForm" class="form-grid">
+                <div class="form-group">
+                    <label for="reporterName">Full Name *</label>
+                    <div class="input-wrapper">
+                        <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        <input type="text" id="reporterName" placeholder="e.g. Capt. Deva" required value="Capt. Deva">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="badgeId">Badge / License ID *</label>
+                    <div class="input-wrapper">
+                        <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="13" y2="12"/></svg>
+                        <input type="text" id="badgeId" placeholder="e.g. KUAD-3045 or KUAD-3035" required value="KUAD-3045">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="reporterRole">Operational Role *</label>
+                    <div class="input-wrapper">
+                        <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                        <select id="reporterRole">
+                            <option value="Captain / Pilot in Command">Captain / Pilot in Command</option>
+                            <option value="Line Maintenance Engineer" selected>Line Maintenance Engineer</option>
+                            <option value="Avionics Specialist">Avionics Specialist</option>
+                            <option value="Flight Engineer">Flight Engineer</option>
+                            <option value="First Officer">First Officer</option>
+                            <option value="Quality Assurance Inspector">Quality Assurance Inspector</option>
+                            <option value="Ground Support Crew">Ground Support Crew</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="station">Station / Base Code</label>
+                    <div class="input-wrapper">
+                        <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                        <input type="text" id="station" placeholder="e.g. JFK / Terminal 4" value="HYD / Terminal 4">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="aircraftReg">Aircraft Tail / Registration</label>
+                    <div class="input-wrapper">
+                        <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg>
+                        <input type="text" id="aircraftReg" placeholder="e.g. N789AA (B737-800)" value="N789AA (B737-800)">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="flightNumber">Flight Number</label>
+                    <div class="input-wrapper">
+                        <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/></svg>
+                        <input type="text" id="flightNumber" placeholder="e.g. AA-1042" value="AA-1042">
+                    </div>
+                </div>
+
+                <div class="form-actions full-width">
+                    <button type="submit" class="primary-btn glow-btn" id="confirmReporterBtn">
+                        <span>Save Reporter Details & Proceed to Anomaly Log</span>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- STEP 2: Defect Diagnostic Input Card -->
+        <section class="glass-card section-card" id="defectCard">
+            <div class="card-header">
+                <div class="card-title-group">
+                    <div class="card-badge">Step 02 of 02</div>
+                    <h2>Aviation Defect & Telemetry Logging</h2>
+                    <p>Specify the aircraft subsystem and tech log description for neural classification.</p>
+                </div>
+            </div>
+
+            <!-- Quick Scenario Chips -->
+            <div class="scenario-container">
+                <span class="scenario-label">Quick Scenario Presets:</span>
+                <div class="scenario-chips">
+                    <button type="button" class="chip hazard-chip" data-comp="Hydraulic System" data-desc="hyd fluid leak found at MLG actuator during turnaround walkaround, pool forming">
+                        🚨 MLG Actuator Hyd Leak
+                    </button>
+                    <button type="button" class="chip hazard-chip" data-comp="Electrical" data-desc="pungent smoke smell in cockpit during taxi, circuit breaker popped at main electrical panel">
+                        🚨 Cockpit Smoke / Electrical
+                    </button>
+                    <button type="button" class="chip ground-chip" data-comp="Flight Controls" data-desc="slat 3 asymmetry caution message displayed on EICAS during flap extension test">
+                        ⚠️ Slat Asymmetry EICAS
+                    </button>
+                    <button type="button" class="chip routine-chip" data-comp="Cabin" data-desc="seat 14B passenger reading light flickering intermittently, replace bulb next check">
+                        🟢 Pax Reading Light
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group full-width">
+                    <label for="component">Affected Subsystem / Component</label>
+                    <div class="input-wrapper">
+                        <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                        <input id="component" list="componentList" placeholder="e.g. Hydraulic System, Engine 2, Avionics, Flight Controls..." autocomplete="off">
+                        <datalist id="componentList">
+                            <option value="Hydraulic System">
+                            <option value="Engine / Powerplant">
+                            <option value="Fuel System">
+                            <option value="Landing Gear & Brakes">
+                            <option value="Flight Controls">
+                            <option value="Electrical Power">
+                            <option value="Avionics & Radar">
+                            <option value="APU (Auxiliary Power Unit)">
+                            <option value="Air Conditioning & Pressurization">
+                            <option value="Cabin Systems">
+                        </datalist>
+                    </div>
+                </div>
+
+                <div class="form-group full-width">
+                    <div class="label-with-counter">
+                        <label for="description">Defect Discrepancy Description (Tech Log Entry) *</label>
+                        <span class="char-count" id="charCounter">0 / 1000</span>
+                    </div>
+                    <div class="input-wrapper textarea-wrapper">
+                        <textarea id="description" rows="4" maxlength="1000" placeholder="Paste or type exact pilot discrepancy or technical maintenance log narrative..."></textarea>
+                    </div>
+                </div>
+
+                <div class="form-actions full-width action-split">
+                    <button type="button" class="secondary-btn" id="clearFormBtn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                        Clear Fields
+                    </button>
+                    <button type="button" class="primary-btn glow-btn triage-btn" id="classifyBtn">
+                        <span class="spinner" id="btnSpinner"></span>
+                        <span class="btn-text">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                            Run Urgency Triage & Classify
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 3: Predictive AI Results Card -->
+        <section class="glass-card result-card" id="resultCard" style="display: none;">
+            <div class="result-backdrop-glow" id="resultGlow"></div>
+            
+            <!-- Result Card Header & Official Ticket Ref -->
+            <div class="result-top-banner">
+                <div class="ticket-badge-group">
+                    <span class="status-indicator-ping"></span>
+                    <span class="ticket-id" id="ticketId">#AERO-2026-XXXX</span>
+                    <span class="ticket-time" id="ticketTime">2026-11-10 00:00:00 UTC</span>
+                </div>
+                <div class="reporter-tag" id="ticketReporter">
+                    Logged by: <strong>Capt. Alex Vance</strong> (AME-7492)
+                </div>
+            </div>
+
+            <!-- Urgency Level Hero Banner -->
+            <div class="urgency-hero" id="urgencyHero">
+                <div class="urgency-icon-wrap" id="urgencyIconWrap">
+                    <span id="urgencyIcon">🚨</span>
+                </div>
+                <div class="urgency-meta">
+                    <span class="eyebrow-label">Safety Classification Assessment</span>
+                    <h3 class="urgency-title" id="urgencyTitle">Immediate Safety Hazard</h3>
+                    <p class="action-directive" id="actionDirective">Ground fleet immediately. Mandatory airworthiness inspection required.</p>
+                </div>
+            </div>
+
+            <!-- Metrics Matrix: Confidence Gauge & Distribution -->
+            <div class="metrics-grid">
+                
+                <!-- Circular Confidence Gauge -->
+                <div class="metric-card gauge-metric">
+                    <div class="gauge-container">
+                        <svg class="radial-gauge" viewBox="0 0 120 120">
+                            <circle class="gauge-track" cx="60" cy="60" r="50"></circle>
+                            <circle class="gauge-fill" id="gaugeCircle" cx="60" cy="60" r="50"></circle>
+                        </svg>
+                        <div class="gauge-center">
+                            <span class="gauge-val" id="confidenceValue">0.0%</span>
+                            <span class="gauge-sub">Confidence</span>
+                        </div>
+                    </div>
+                    <div class="gauge-footer" id="confidenceBadge">
+                        High Model Certainty
+                    </div>
+                </div>
+
+                <!-- Probability Distribution Bars -->
+                <div class="metric-card prob-metric">
+                    <h4>Multi-Class Probability Distribution</h4>
+                    <div class="prob-list" id="probList">
+                        <!-- Rendered dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- NLP Diagnostic Tokens & Cleaned Tech String -->
+            <div class="nlp-details-panel">
+                <div class="nlp-group">
+                    <span class="nlp-label">Recognized Aerospace Keywords:</span>
+                    <div class="keyword-chips" id="keywordChips">
+                        <!-- Chips inserted via JS -->
+                    </div>
+                </div>
+                <div class="nlp-group">
+                    <span class="nlp-label">Cleaned & Tokenized Telemetry Text:</span>
+                    <div class="cleaned-box" id="cleanedText">--</div>
+                </div>
+            </div>
+
+            <!-- Result Bottom Controls -->
+            <div class="result-actions">
+                <button type="button" class="secondary-btn" id="printReportBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                    Print Triage Ticket
+                </button>
+                <button type="button" class="primary-btn glow-btn" id="logAnotherBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    Log Another Defect
+                </button>
+            </div>
+        </section>
+
+        <!-- AUDIT LOG MODAL / DRAWER -->
+        <div class="modal-overlay" id="historyModal" style="display: none;">
+            <div class="glass-card modal-content">
+                <div class="modal-header">
+                    <div class="modal-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                        <h3>Incident Triage Audit Log</h3>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="small-btn danger-btn" id="clearHistoryBtn" type="button">Clear Registry</button>
+                        <button class="close-btn" id="closeHistoryBtn" type="button">&times;</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="audit-table">
+                        <thead>
+                            <tr>
+                                <th>Ticket ID</th>
+                                <th>Timestamp</th>
+                                <th>Reporter</th>
+                                <th>Aircraft</th>
+                                <th>Component</th>
+                                <th>Urgency</th>
+                                <th>Confidence</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                            <tr>
+                                <td colspan="7" class="empty-table">No incidents recorded yet in this session.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script src="/static/script.js?v=4.1"></script>
+</body>
+</html>
